@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ProjectGuid>{2288B225-9AC2-4E18-8036-EEA68C565B18}</ProjectGuid>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Clock.cs" />
+    <Compile Include="Clocks.cs" />
+    <Compile Include="Http.cs" />
+    <Compile Include="NTP.cs" />
+    <Compile Include="Probe.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="TimeConverter.cs" />
+    <Compile Include="UnauthorizedHandler.cs" />
+  </ItemGroup>
+</Project>
