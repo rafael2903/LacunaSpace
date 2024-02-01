@@ -9,38 +9,81 @@ namespace LacunaSpace;
 record class LoginResponse(string? accessToken, string code, string? message);
 record class ListProbesResponse(ProbeInfo[]? probes, string code, string? message);
 record class ProbeInfo(string id, string name, string encoding);
+record class Job(string id, string probeName);
+record class JobResponse(Job? job, string code, string? message);
+record class Response(string code, string? message);
+
 class Program
 {
-    public static async Task Main(string[] args)
+    public static async Task Main()
     {
-        //string dateString;
-        //DateTimeOffset offsetDate;
-
-        //// String with date only
-        //dateString = "2023-06-03T12:57:27.6003807+00:00"; // ticks based on the ISO datetime string format: yyyy-MM-ddTHH:mm:ss.FFFFFFFzzz
-        //offsetDate = DateTimeOffset.ParseExact(dateString, "o", CultureInfo.InvariantCulture);
-        //Console.WriteLine(offsetDate.ToString());
-        //Console.WriteLine("638213938476003807"); // ticks long value string
-        //Console.WriteLine(offsetDate.Ticks);
-        ////Console.WriteLine(DateTimeStyles.RoundtripKind);
-        //Console.WriteLine(BitConverter.IsLittleEndian);
-        //Console.WriteLine(BitConverter.ToInt64(Convert.FromBase64String("37GQFTJk2wg="))); // ticks long bytes (little-endian) Base64 string
-        //Console.WriteLine(BinaryPrimitives.ReverseEndianness(BitConverter.ToInt64(Convert.FromBase64String("CNtkMhWQsd8=")))); // ticks long bytes (big-endian) Base64 string
-
-        List<Probe> probes;
+        List<Clock> clocks;
 
         var httpClient = new HttpClient();
         httpClient.BaseAddress = new Uri("https://luma.lacuna.cc/api/");
         var http = new Http(httpClient);
 
         await StartTestContext(http);
-        await GetProbes(http);
-        //var ntp = new NTP(http);
+        var probes = await GetProbes(http);
 
-        //foreach (var probe in probes)
-        //{
-        //    await ntp.Sync(probe);
-        //}
+        clocks = probes.Select(probe => (new Clock(new Probe(probe.id, probe.name, probe.encoding)))).ToList();
+        var synchronizer = new Synchronizer(http);
+
+        foreach (var clock in clocks)
+        {
+            await clock.Sync(synchronizer);
+        }
+
+        while (true)
+        {
+            JobResponse? jobResponse = await http.Post<JobResponse>("job/take");
+            if (jobResponse?.code == "Success" && jobResponse.job != null)
+            {
+                Job job = jobResponse.job;
+                Console.WriteLine("Job taken");
+                Console.WriteLine(job.probeName);
+
+                //Probe probe = clocks.FirstOrDefault(clock => clock.Probe.Name == job.probeName)?.Probe;
+                Clock clock = (from _clock in clocks
+                                      where _clock.Probe.Name == job.probeName
+                                      select _clock
+                             ).First();
+
+                Dictionary<string, object> data = new()
+                {
+                    { "probeNow",  TimeConverter.Encode(clock.CurrentTime, clock.Probe.Encoding)},
+                    { "roundTrip", clock.RoundTrip }
+                };
+                string body = JsonSerializer.Serialize(data);
+                
+                Response? response = await http.Post<Response>($"job/{job.id}/check", body);
+                if (response?.code == "Success")
+                {
+                    Console.WriteLine("Job checked");
+                }
+                else if (response?.code == "Fail")
+                {
+                    Console.WriteLine("failed");
+                    break;
+                }
+                else if (response?.code == "Done")
+                {
+                    Console.WriteLine("Done");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Failed to check job");
+                    break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to take job");
+            }
+            
+            //await Task.Delay(1000);
+        }
     }
 
     public static async Task StartTestContext(Http http)
@@ -52,7 +95,6 @@ class Program
         };
         string body = JsonSerializer.Serialize(data);
 
-        //var response = await Post<LoginResponse>(client, "users/login", body);
         var response = await http.Post<LoginResponse>("start", body);
 
         if (response?.code == "Success")
@@ -62,7 +104,7 @@ class Program
         }
     }
 
-    public static async Task GetProbes(Http http)
+    public static async Task<ProbeInfo[]> GetProbes(Http http)
     {
         var response = await http.Client.GetFromJsonAsync<ListProbesResponse>("probe");
 
@@ -71,7 +113,14 @@ class Program
             foreach (var probe in response.probes)
             {
                 Console.WriteLine(probe.name);
+                Console.WriteLine(probe.id);
+                Console.WriteLine(probe.encoding);
             }
+            return response.probes;
+        }
+        else
+        {
+            throw new Exception("Failed to get probes");
         }
     }
 }

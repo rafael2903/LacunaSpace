@@ -16,8 +16,8 @@ public class TimeConverter
     {
         { "Iso8601", Encoding.ISO8601 },
         { "Ticks", Encoding.Ticks },
-        { "TicksBigEndian", Encoding.TicksBigEndian },
-        { "TicksLittleEndian", Encoding.TicksLittleEndian }
+        { "TicksBinaryBigEndian", Encoding.TicksBigEndian },
+        { "TicksBinary", Encoding.TicksLittleEndian }
     };
 
     public static DateTimeOffset Decode(string dateString, Encoding encoding)
@@ -28,6 +28,18 @@ public class TimeConverter
             Encoding.Ticks => DateTimeOffsetFromTicks(Int64.Parse(dateString)),
             Encoding.TicksBigEndian => DateTimeOffsetFromBase64TicksBigEndian(dateString),
             Encoding.TicksLittleEndian => DateTimeOffsetFromBase64TicksLittleEndian(dateString),
+            _ => throw new ArgumentException("Invalid time format", nameof(encoding)),
+        };
+    }
+
+    public static string Encode(DateTimeOffset dateTimeOffset, Encoding encoding)
+    {
+        return encoding switch
+        {
+            Encoding.ISO8601 => ISO8601FromDateTimeOffset(dateTimeOffset),
+            Encoding.Ticks => dateTimeOffset.Ticks.ToString(),
+            Encoding.TicksBigEndian => Convert.ToBase64String(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(dateTimeOffset.Ticks))),
+            Encoding.TicksLittleEndian => Convert.ToBase64String(BitConverter.GetBytes(dateTimeOffset.Ticks)),
             _ => throw new ArgumentException("Invalid time format", nameof(encoding)),
         };
     }
