@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 record class Response(string code, string? message);
 
 class UnauthorizedHandler : DelegatingHandler

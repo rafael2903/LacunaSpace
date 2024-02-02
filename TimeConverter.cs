@@ -1,5 +1,4 @@
-﻿using System;
-using System.Buffers.Binary;
+﻿using System.Buffers.Binary;
 using System.Globalization;
 
 public class TimeConverter
@@ -11,14 +10,6 @@ public class TimeConverter
         TicksBigEndian,
         TicksLittleEndian
     }
-
-    public static readonly Dictionary<string, Encoding> Encodings = new()
-    {
-        { "Iso8601", Encoding.ISO8601 },
-        { "Ticks", Encoding.Ticks },
-        { "TicksBinaryBigEndian", Encoding.TicksBigEndian },
-        { "TicksBinary", Encoding.TicksLittleEndian }
-    };
 
     public static DateTimeOffset Decode(string dateString, Encoding encoding)
     {
@@ -38,8 +29,8 @@ public class TimeConverter
         {
             Encoding.ISO8601 => ISO8601FromDateTimeOffset(dateTimeOffset),
             Encoding.Ticks => dateTimeOffset.Ticks.ToString(),
-            Encoding.TicksBigEndian => Convert.ToBase64String(BitConverter.GetBytes(BinaryPrimitives.ReverseEndianness(dateTimeOffset.Ticks))),
-            Encoding.TicksLittleEndian => Convert.ToBase64String(BitConverter.GetBytes(dateTimeOffset.Ticks)),
+            Encoding.TicksBigEndian => Base64TicksBigEndianFromDateTimeOffset(dateTimeOffset),
+            Encoding.TicksLittleEndian => Base64TicksLittleEndianFromDateTimeOffset(dateTimeOffset),
             _ => throw new ArgumentException("Invalid time format", nameof(encoding)),
         };
     }
@@ -52,6 +43,21 @@ public class TimeConverter
     public static DateTimeOffset DateTimeOffsetFromISO8601(string dateString)
     {
         return DateTimeOffset.ParseExact(dateString, "o", CultureInfo.InvariantCulture);
+    }
+
+    public static string ISO8601FromDateTimeOffset(DateTimeOffset dateTimeOffset)
+    {
+        return dateTimeOffset.ToString("o");
+    }
+
+    private static long Int64FromBase64(string base64)
+    {
+        return BitConverter.ToInt64(Convert.FromBase64String(base64));
+    }
+
+    private static string Base64FromInt64(long value)
+    {
+        return Convert.ToBase64String(BitConverter.GetBytes(value));
     }
 
     public static DateTimeOffset DateTimeOffsetFromBase64TicksLittleEndian(string ticksBase64)
@@ -68,9 +74,16 @@ public class TimeConverter
         }
     }
 
-    private static long Int64FromBase64(string base64)
+    public static string Base64TicksLittleEndianFromDateTimeOffset(DateTimeOffset dateTimeOffset)
     {
-        return BitConverter.ToInt64(Convert.FromBase64String(base64));
+        if (BitConverter.IsLittleEndian)
+        {
+            return Base64FromInt64(dateTimeOffset.Ticks);
+        }
+        else
+        {
+            return Base64FromInt64(BinaryPrimitives.ReverseEndianness(dateTimeOffset.Ticks));
+        }
     }
 
     public static DateTimeOffset DateTimeOffsetFromBase64TicksBigEndian(string ticksBase64)
@@ -86,31 +99,15 @@ public class TimeConverter
         }
     }
 
-    public static long TicksFromDateTimeOffset(DateTimeOffset dateTimeOffset)
+    public static string Base64TicksBigEndianFromDateTimeOffset(DateTimeOffset dateTimeOffset)
     {
-        return dateTimeOffset.Ticks;
-    }
-
-    public static long TicksFromISO8601(string dateString)
-    {
-        return DateTimeOffset.ParseExact(dateString, "o", CultureInfo.InvariantCulture).Ticks;
-    }
-
-    public static string ISO8601FromDateTimeOffset(DateTimeOffset dateTimeOffset)
-    {
-        return dateTimeOffset.ToString("o");
-    }
+        if (BitConverter.IsLittleEndian)
+        {
+            return Base64FromInt64(BinaryPrimitives.ReverseEndianness(dateTimeOffset.Ticks));
+        }
+        else
+        {
+            return Base64FromInt64(dateTimeOffset.Ticks);
+        }
+    } 
 }
-
-
-
-//// String with date only
-//dateString = "2023-06-03T12:57:27.6003807+00:00"; // ticks based on the ISO datetime string format: yyyy-MM-ddTHH:mm:ss.FFFFFFFzzz
-//offsetDate = DateTimeOffset.ParseExact(dateString, "o", CultureInfo.InvariantCulture);
-//Console.WriteLine(offsetDate.ToString());
-//Console.WriteLine("638213938476003807"); // ticks long value string
-//Console.WriteLine(offsetDate.Ticks);
-////Console.WriteLine(DateTimeStyles.RoundtripKind);
-//Console.WriteLine(BitConverter.IsLittleEndian);
-//Console.WriteLine(BitConverter.ToInt64(Convert.FromBase64String("37GQFTJk2wg="))); // ticks long bytes (little-endian) Base64 string
-//Console.WriteLine(BinaryPrimitives.ReverseEndianness(BitConverter.ToInt64(Convert.FromBase64String("CNtkMhWQsd8=")))); // ticks long bytes (big-endian) Base64 string

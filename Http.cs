@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text;
 
-public class Http(HttpClient client)
+public class HttpService(HttpClient client)
 {
     public HttpClient Client { get; } = client;
     //public async Task<T?> Post<T>(string requestUri, string? body = null)

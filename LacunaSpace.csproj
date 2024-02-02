@@ -8,13 +8,14 @@
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CheckJobUseCase.cs" />
     <Compile Include="Clock.cs" />
-    <Compile Include="Clocks.cs" />
+    <Compile Include="GetProbesUseCase.cs" />
     <Compile Include="Http.cs" />
+    <Compile Include="StartTestContextUseCase.cs" />
     <Compile Include="Synchronizer.cs" />
     <Compile Include="Probe.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="TimeConverter.cs" />
-    <Compile Include="UnauthorizedHandler.cs" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics.Metrics;
-using static System.Net.WebRequestMethods;
-
-public class Clock(Probe probe)
+﻿public class Clock(Probe probe)
 {
     public Probe Probe { get; set;} = probe;
     public TimeSpan TimeOffset { get; set; } = TimeSpan.Zero;
@@ -10,15 +6,15 @@ public class Clock(Probe probe)
 
     private readonly TimeSpan _offsetThreshold = TimeSpan.FromSeconds(0.005);
 
-    public DateTime CurrentTime => (DateTime.UtcNow + TimeOffset);
+    public DateTime Now => (DateTime.UtcNow + TimeOffset);
     public async Task Sync(Synchronizer synchronizer)
     {
         int counter = 0;
         while (true)
         {
-            var t0 = CurrentTime;
+            var t0 = Now;
             var (t1Str, t2Str) = await synchronizer.GetTimestamps(Probe.Id);
-            var t3 = CurrentTime;
+            var t3 = Now;
 
             counter++;
             var t1 = TimeConverter.Decode(t1Str, probe.Encoding);
@@ -30,7 +26,6 @@ public class Clock(Probe probe)
             RoundTrip = roundTrip.Ticks;
             TimeOffset += timeOffset;
 
-            Console.WriteLine(timeOffset);
 
             if (timeOffset.Duration() <= _offsetThreshold)
             {

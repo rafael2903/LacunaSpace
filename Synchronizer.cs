@@ -1,11 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.Text.Json;
-
-record class SyncResponse(string t1, string t2, string code, string? message);
-public class Synchronizer(Http http)
+﻿record class SyncResponse(string t1, string t2, string code, string? message);
+public class Synchronizer(HttpService http)
 {
-    private readonly Http _http = http;
+    private readonly HttpService _http = http;
 
     public async Task<(string t1, string t2)> GetTimestamps(string probeId)
     {

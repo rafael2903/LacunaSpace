@@ -1,9 +1,18 @@
 ﻿
+
+//public class Probe(string id, string name, string encoding)
+//{
+//    public string Id { get; set; } = id;
+//    public string Name { get; set; } = name;
+//    public Encoding Encoding { get; set; } = Encodings.ContainsKey(encoding) ? Encodings[encoding] : throw new ArgumentException("Invalid encoding", nameof(encoding));
+//}
+
+
 using static TimeConverter;
 
-public class Probe(string id, string name, string encoding)
+public class Probe(string id, string name, Encoding encoding)
 {
     public string Id { get; set; } = id;
     public string Name { get; set; } = name;
-    public Encoding Encoding { get; set; } = Encodings.ContainsKey(encoding) ? Encodings[encoding] : throw new ArgumentException("Invalid encoding", nameof(encoding));
+    public Encoding Encoding { get; set; } = encoding;
 }
