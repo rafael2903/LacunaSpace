@@ -4,20 +4,6 @@ using System.Text;
 public class HttpService(HttpClient client)
 {
     public HttpClient Client { get; } = client;
-    //public async Task<T?> Post<T>(string requestUri, string? body = null)
-    //{
-    //    HttpContent? content = null;
-
-    //    if (!string.IsNullOrEmpty(body))
-    //        content = new StringContent(body, Encoding.UTF8, "application/json");
-
-    //    var httpResponse = await _client.PostAsync(requestUri, content);
-    //    var responseContent = await httpResponse.Content.ReadAsStringAsync();
-    //    Console.Write(responseContent);
-    //    //var response = JsonSerializer.Deserialize<T>(responseContent);
-
-    //    return responseContent;
-    //}
 
     public async Task<string> Post(string requestUri, string? body = null)
     {

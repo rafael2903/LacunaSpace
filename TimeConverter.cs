@@ -1,15 +1,18 @@
 ﻿using System.Buffers.Binary;
 using System.Globalization;
 
+namespace Converters;
+
+public enum Encoding
+{
+    ISO8601,
+    Ticks,
+    TicksBigEndian,
+    TicksLittleEndian
+}
+
 public class TimeConverter
 {
-    public enum Encoding
-    {
-        ISO8601,
-        Ticks,
-        TicksBigEndian,
-        TicksLittleEndian
-    }
 
     public static DateTimeOffset Decode(string dateString, Encoding encoding)
     {

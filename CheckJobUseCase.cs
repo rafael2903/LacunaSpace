@@ -1,6 +1,5 @@
-﻿using LacunaSpace;
-using System.Text.Json;
-using static TimeConverter;
+﻿using System.Text.Json;
+using Converters;
 
 record class Response(string code, string? message);
 
@@ -12,7 +11,7 @@ public class CheckJobUseCase(HttpService http)
     {
         var data = new
         {
-            probeNow = Encode(probeNow, probeEncoding),
+            probeNow = TimeConverter.Encode(probeNow, probeEncoding),
             roundTrip
         };
         string body = JsonSerializer.Serialize(data);

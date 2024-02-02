@@ -1,12 +1,13 @@
-﻿public class Clock(Probe probe)
+﻿using Converters;
+
+public class Clock(Probe probe)
 {
     public Probe Probe { get; set;} = probe;
     public TimeSpan TimeOffset { get; set; } = TimeSpan.Zero;
     public long RoundTrip { get; set; } = 0;
-
+    public DateTime Now => (DateTime.UtcNow + TimeOffset);
     private readonly TimeSpan _offsetThreshold = TimeSpan.FromSeconds(0.005);
 
-    public DateTime Now => (DateTime.UtcNow + TimeOffset);
     public async Task Sync(Synchronizer synchronizer)
     {
         int counter = 0;
@@ -25,7 +26,6 @@
 
             RoundTrip = roundTrip.Ticks;
             TimeOffset += timeOffset;
-
 
             if (timeOffset.Duration() <= _offsetThreshold)
             {

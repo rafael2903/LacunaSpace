@@ -8,6 +8,7 @@
     <EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CheckJobsUseCase.cs" />
     <Compile Include="CheckJobUseCase.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="GetProbesUseCase.cs" />
