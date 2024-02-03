@@ -14,9 +14,7 @@ public class StartTestContextUseCase(HttpService http)
             email = "rafaelrodrigues2903@gmail.com"
         };
 
-        string body = JsonSerializer.Serialize(data);
-
-        var response = await _http.Post<LoginResponse>("start", body);
+        var response = await _http.Post<LoginResponse>("start", data);
 
         if (response?.code == "Success")
         {

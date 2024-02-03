@@ -5,12 +5,15 @@ public class HttpService(HttpClient client)
 {
     public HttpClient Client { get; } = client;
 
-    public async Task<string> Post(string requestUri, string? body = null)
+    public async Task<string> Post(string requestUri, object? data = null)
     {
         HttpContent? content = null;
 
-        if (!string.IsNullOrEmpty(body))
+        if (data != null)
+        {
+            string body = JsonSerializer.Serialize(data);
             content = new StringContent(body, Encoding.UTF8, "application/json");
+        }
 
         HttpResponseMessage response = await Client.PostAsync(requestUri, content);
         response.EnsureSuccessStatusCode();
@@ -20,9 +23,9 @@ public class HttpService(HttpClient client)
         return responseContent;
     }
 
-    public async Task<T?> Post<T>(string requestUri, string? body = null)
+    public async Task<T?> Post<T>(string requestUri, object? data = null)
     {
-        string responseContent = await Post(requestUri, body);
+        string responseContent = await Post(requestUri, data);
         var response = JsonSerializer.Deserialize<T>(responseContent);
 
         return response;

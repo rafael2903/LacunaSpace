@@ -14,9 +14,9 @@
     <Compile Include="GetProbesUseCase.cs" />
     <Compile Include="Http.cs" />
     <Compile Include="StartTestContextUseCase.cs" />
-    <Compile Include="Synchronizer.cs" />
     <Compile Include="Probe.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="SyncService.cs" />
     <Compile Include="TimeConverter.cs" />
   </ItemGroup>
 </Project>

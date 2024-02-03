@@ -14,9 +14,8 @@ public class CheckJobUseCase(HttpService http)
             probeNow = TimeConverter.Encode(probeNow, probeEncoding),
             roundTrip
         };
-        string body = JsonSerializer.Serialize(data);
 
-        Response? response = await _http.Post<Response>($"job/{jobId}/check", body);
+        Response? response = await _http.Post<Response>($"job/{jobId}/check", data);
 
         if (response?.code == "Success")
         {

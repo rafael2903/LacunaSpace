@@ -1,6 +1,6 @@
-﻿
-using LacunaSpace;
-using System.Text.Json;
+﻿using System.Text.Json;
+record class Job(string id, string probeName);
+record class JobResponse(Job? job, string code, string? message);
 
 public class CheckJobsUseCase(HttpService http)
 {
@@ -8,11 +8,11 @@ public class CheckJobsUseCase(HttpService http)
 
     public async Task Execute(List<Clock> clocks)
     {
-        var checkJobUseCase = new CheckJobUseCase(http);
+        var checkJobUseCase = new CheckJobUseCase(_http);
 
         while (true)
         {
-            JobResponse? jobResponse = await http.Post<JobResponse>("job/take");
+            JobResponse? jobResponse = await _http.Post<JobResponse>("job/take");
 
             if (jobResponse == null || jobResponse.code == "Error")
             {
