@@ -14,7 +14,7 @@ public class StartTestContextUseCase(HttpService http)
             email = "rafaelrodrigues2903@gmail.com"
         };
 
-        var response = await _http.Post<LoginResponse>("start", data);
+        var response = await _http.Post<LoginResponse>("start/2", data);
 
         if (response?.code == "Success")
         {

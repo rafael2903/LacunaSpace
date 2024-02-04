@@ -2,7 +2,7 @@
 using Converters;
 
 record class ListProbesResponse(ProbeInfo[]? probes, string code, string? message);
-record class ProbeInfo(string id, string name, string encoding);
+record class ProbeInfo(string id, string name, string encoding, double? timeDilationFactor);
 
 public class GetProbesUseCase(HttpService http)
 {
@@ -38,6 +38,6 @@ public class GetProbesUseCase(HttpService http)
     private Probe ConvertProbeInfo(ProbeInfo probesInfo)
     {
         var encoding = _encodings.TryGetValue(probesInfo.encoding, out var _encoding) ? _encoding : throw new ArgumentException("Invalid encoding", nameof(probesInfo.encoding));
-        return new Probe(probesInfo.id, probesInfo.name, encoding);
+        return new Probe(probesInfo.id, probesInfo.name, encoding, probesInfo.timeDilationFactor);
     }
 }
