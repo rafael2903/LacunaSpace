@@ -13,6 +13,7 @@
     <Compile Include="Clock.cs" />
     <Compile Include="GetProbesUseCase.cs" />
     <Compile Include="Http.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="StartTestContextUseCase.cs" />
     <Compile Include="Probe.cs" />
     <Compile Include="Program.cs" />

@@ -1,7 +1,6 @@
-﻿using System.Text.Json;
-using Converters;
+﻿using Converters;
 
-record class Response(string code, string? message);
+record class Response(string Code, string? Message);
 
 public class CheckJobUseCase(HttpService http)
 {
@@ -17,21 +16,20 @@ public class CheckJobUseCase(HttpService http)
 
         Response? response = await _http.Post<Response>($"job/{jobId}/check", data);
 
-        if (response?.code == "Success")
+        switch (response?.Code)
         {
-            Console.WriteLine("Job checked");
-        }
-        else if (response?.code == "Fail")
-        {
-            Console.WriteLine("failed");
-        }
-        else if (response?.code == "Done")
-        {
-            Console.WriteLine("Done");
-        }
-        else
-        {
-            Console.WriteLine("Failed to check job");
+            case "Success":
+                Logger.LogSuccess("Job checked");
+                break;
+            case "Fail":
+                Logger.LogError("Test failed");
+                break;
+            case "Done":
+                Logger.LogSuccess("Done");
+                break;
+            default:
+                Logger.LogError("Failed to check job");
+                break;
         }
     }
 }

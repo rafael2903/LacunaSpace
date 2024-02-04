@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Headers;
-using System.Text.Json;
 
-record class LoginResponse(string? accessToken, string code, string? message);
+record class LoginResponse(string? AccessToken, string Code, string? Message);
 public class StartTestContextUseCase(HttpService http)
 {
     private readonly HttpService _http = http;
@@ -16,15 +15,14 @@ public class StartTestContextUseCase(HttpService http)
 
         var response = await _http.Post<LoginResponse>("start/2", data);
 
-        if (response?.code == "Success")
+        if (response?.Code == "Success")
         {
-            Console.WriteLine("Successfully started test");
-            _http.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.accessToken);
+            Logger.LogSuccess("Successfully started test");
+            _http.Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", response.AccessToken);
         }
         else
         {
-            Console.WriteLine("Failed to start test");
-            Environment.Exit(1);
+            throw new Exception("Failed to start test");
         }
     }
 }

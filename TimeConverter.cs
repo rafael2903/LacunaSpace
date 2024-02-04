@@ -112,5 +112,5 @@ public class TimeConverter
         {
             return Base64FromInt64(dateTimeOffset.Ticks);
         }
-    } 
+    }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Net.Http.Json;
 using Converters;
 
-record class ListProbesResponse(ProbeInfo[]? probes, string code, string? message);
-record class ProbeInfo(string id, string name, string encoding, double? timeDilationFactor);
+record class ListProbesResponse(ProbeInfo[]? Probes, string Code, string? Message);
+record class ProbeInfo(string Id, string Name, string Encoding, double? TimeDilationFactor);
 
 public class GetProbesUseCase(HttpService http)
 {
@@ -16,28 +16,24 @@ public class GetProbesUseCase(HttpService http)
         { "TicksBinary", Encoding.TicksLittleEndian }
     };
 
+    private Probe ConvertProbeInfo(ProbeInfo probesInfo)
+    {
+        var encoding = _encodings.TryGetValue(probesInfo.Encoding, out var _encoding) ? _encoding : throw new ArgumentException("Invalid encoding", nameof(probesInfo));
+
+        return new Probe(probesInfo.Id, probesInfo.Name, encoding, probesInfo.TimeDilationFactor);
+    }
+
     public async Task<Probe[]> Execute()
     {
         var response = await _http.Client.GetFromJsonAsync<ListProbesResponse>("probe");
 
-        if (response?.code == "Success" && response.probes != null)
+        if (response?.Code == "Success" && response.Probes != null)
         {
-            foreach (var probe in response.probes)
-            {
-                Console.WriteLine(probe.name);
-            }
+            Console.Write("Probes: ");
+            Console.WriteLine(string.Join(", ", response.Probes.Select(probe => probe.Name)));
 
-            return response.probes.Select(ConvertProbeInfo).ToArray();
+            return response.Probes.Select(ConvertProbeInfo).ToArray();
         }
-        else
-        {
-            throw new Exception("Failed to get probes");
-        }
-    }
-
-    private Probe ConvertProbeInfo(ProbeInfo probesInfo)
-    {
-        var encoding = _encodings.TryGetValue(probesInfo.encoding, out var _encoding) ? _encoding : throw new ArgumentException("Invalid encoding", nameof(probesInfo.encoding));
-        return new Probe(probesInfo.id, probesInfo.name, encoding, probesInfo.timeDilationFactor);
+        else throw new Exception("Failed to get probes");
     }
 }

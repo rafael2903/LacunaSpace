@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
-record class Job(string id, string probeName);
-record class JobResponse(Job? job, string code, string? message);
+﻿record class Job(string Id, string ProbeName);
+record class JobResponse(Job? Job, string Code, string? Message);
 
 public class CheckJobsUseCase(HttpService http)
 {
@@ -14,25 +13,25 @@ public class CheckJobsUseCase(HttpService http)
         {
             JobResponse? jobResponse = await _http.Post<JobResponse>("job/take");
 
-            if (jobResponse == null || jobResponse.code == "Error")
+            if (jobResponse == null || jobResponse.Code == "Error")
             {
-                Console.WriteLine("Failed to take job");
-                Console.WriteLine(JsonSerializer.Serialize(jobResponse));
+                Logger.LogError("Failed to take job");
                 break;
             }
-            else if (jobResponse.job == null)
+            else if (jobResponse.Job == null)
             {
-                Console.WriteLine("No jobs left");
+                Logger.LogSuccess("No jobs left");
                 break;
             }
-            else if (jobResponse.code == "Success")
+            else if (jobResponse.Code == "Success")
             {
-                Job job = jobResponse.job;
-                Console.WriteLine("Job taken - " + job.probeName);
+                Job job = jobResponse.Job;
 
-                Clock clock = clocks.First(_clock => _clock.Probe.Name == job.probeName);
+                Console.WriteLine("Job taken - " + job.ProbeName);
 
-                await checkJobUseCase.Execute(job.id, clock.Now, clock.Probe.Encoding, clock.RoundTrip);
+                Clock clock = clocks.First(_clock => _clock.Probe.Name == job.ProbeName);
+
+                await checkJobUseCase.Execute(job.Id, clock.Now, clock.Probe.Encoding, clock.RoundTrip);
             }
         }
     }

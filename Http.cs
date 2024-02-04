@@ -9,25 +9,26 @@ public class HttpService(HttpClient client)
     {
         HttpContent? content = null;
 
-        if (data != null)
+        if (data is not null)
         {
             string body = JsonSerializer.Serialize(data);
             content = new StringContent(body, Encoding.UTF8, "application/json");
         }
 
-        HttpResponseMessage response = await Client.PostAsync(requestUri, content);
+        var response = await Client.PostAsync(requestUri, content);
+
         response.EnsureSuccessStatusCode();
- 
+
         string responseContent = await response.Content.ReadAsStringAsync();
 
         return responseContent;
     }
 
+    private static readonly JsonSerializerOptions jsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
     public async Task<T?> Post<T>(string requestUri, object? data = null)
     {
         string responseContent = await Post(requestUri, data);
-        var response = JsonSerializer.Deserialize<T>(responseContent);
-
-        return response;
+        return JsonSerializer.Deserialize<T>(responseContent, jsonOptions);
     }
 }
