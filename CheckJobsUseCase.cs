@@ -13,7 +13,7 @@ public class CheckJobsUseCase(HttpService http)
         {
             JobResponse? jobResponse = await _http.Post<JobResponse>("job/take");
 
-            if (jobResponse == null || jobResponse.Code == "Error")
+            if (jobResponse is null || jobResponse.Code == "Error")
             {
                 Logger.LogError("Failed to take job");
                 break;

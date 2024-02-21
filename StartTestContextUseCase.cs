@@ -1,5 +1,6 @@
-﻿using System.Net.Http.Headers;
-
+﻿using LacunaSpace;
+using System.Net.Http.Headers;
+using static LacunaSpace.Program;
 record class LoginResponse(string? AccessToken, string Code, string? Message);
 public class StartTestContextUseCase(HttpService http)
 {
@@ -12,8 +13,8 @@ public class StartTestContextUseCase(HttpService http)
             username = "Rafael Rodrigues",
             email = "rafaelrodrigues2903@gmail.com"
         };
-
-        var response = await _http.Post<LoginResponse>("start/2", data);
+        var requestUri = Globals.UseV2Api ? "start/2" : "start";
+        var response = await _http.Post<LoginResponse>(requestUri, data);
 
         if (response?.Code == "Success")
         {

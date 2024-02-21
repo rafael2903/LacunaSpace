@@ -27,7 +27,7 @@ public class GetProbesUseCase(HttpService http)
     {
         var response = await _http.Client.GetFromJsonAsync<ListProbesResponse>("probe");
 
-        if (response?.Code == "Success" && response.Probes != null)
+        if (response?.Code == "Success" && response.Probes is not null)
         {
             Console.Write("Probes: ");
             Console.WriteLine(string.Join(", ", response.Probes.Select(probe => probe.Name)));

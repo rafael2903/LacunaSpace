@@ -28,7 +28,7 @@ public class SyncService(HttpService http)
                 continue;
             }
 
-            if (response == null || response.Code != "Success")
+            if (response is null || response.Code != "Success")
             {
                 Logger.LogError("Failed to get timestamps - " + clock.Probe.Name);
                 break;

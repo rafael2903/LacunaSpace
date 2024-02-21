@@ -2,6 +2,11 @@
 
 class Program
 {
+    public static class Globals
+    {
+        public const bool UseV2Api = true;
+    }
+
     public static async Task Main()
     {
 
